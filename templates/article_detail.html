@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+    <h3 class="text-center">{{ article.title }}</h3>
+    <div class="content">
+        {{ article.articledetail.content|safe }}
+    </div>
+    <div id="info" article_id="{{ article.pk }}" username="{{ request.user.username }}"></div>
+
+    <div class="clearfix">
+        <div id="div_digg">
+            <div class="diggit digg">
+                <span class="diggnum" id="digg_count">{{ article.up_count }}</span>
+            </div>
+            <div class="buryit digg">
+                <span class="burynum" id="bury_count">{{ article.down_count }}</span>
+            </div>
+        </div>
+    </div>
+    <div id="digg_word" class="pull-right"></div>
+
+    <hr>
+
+    <h3>评论树</h3>
+
+    <div class="comment_tree list-group comment_list ">
+
+
+    </div>
+
+
+    <script>
+
+        (function () {
+
+            $.ajax({
+                url: "/app01/get_comment_tree/" + $("#info").attr("article_id"),
+                success: function (comment_list) {
+                    var comment_html = "";
+                    $.each(comment_list, function (index, comment) {
+                        console.log(comment);
+                        var username = comment.user__username;
+                        var content = comment.content;
+                        var pk = comment.pk;
+                        var pid = comment.parent_comment_id;
+
+                        s = '<div class="comment_tree_item" id=' + pk + '><span>' + username + '</span> <span>' + content + '</span> </div>'
+
+                        if (pid) {
+                            $("#" + pid).append(s);
+                        } else {
+                            $(".comment_tree").append(s);
+                        }
+
+
+                    })
+
+
+                }
+
+            })
+
+
+        })()
+
+
+    </script>
+    <hr>
+
+
+
+
+    <p>评论楼</p>
+    <ul class="list-group comment_list">
+        {% for comment in comment_list %}
+            <li class="list-group-item comment_item">
+                <div>
+                    <a href="">#{{ forloop.counter }}楼</a>&nbsp;&nbsp;&nbsp;
+                    <span>{{ comment.create_time|date:"Y-m-d H:i" }}</span>&nbsp;&nbsp;
+                    <a href=""><img width="20px" height="20px" src="/media/{{ comment.user.avatar}}" alt="" style="border-radius: 50%;">{{ comment.user.username }}</a>
+                    <a class="pull-right reply" pk="{{ comment.pk }}" username="{{ comment.user.username }}">回复</a>
+                </div>
+                {% if comment.parent_comment_id %}
+                    <div class="parent_comment_info well">
+                        <a href="">@{{ comment.parent_comment.user.username }}</a>&nbsp;&nbsp;
+                        <span>{{ comment.parent_comment.content }}</span>
+                    </div>
+                {% endif %}
+
+                <div>
+                    <p>{{ comment.content }}</p>
+                </div>
+            </li>
+        {% endfor %}
+
+
+    </ul>
+
+
+
+    <div class="comment_region">
+        <div class="row">
+            <div class="col-md-6">
+                <p>昵称：<input type="text" id="tbCommentAuthor" class="author" disabled="disabled" size="50"value="{{ request.user.username }}"></p>
+                <p>评论内容：</p>
+                <textarea name="" id="comment_text" cols="60" rows="10"></textarea>
+                <button class="btn btn-default pull-right comment_btn">提交</button>
+            </div>
+            <div class="col-md-6 pull-right"><img width="400px" height="280px" src="/static/img/01.png" alt=""></div>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+        var pid = "";
+        // 绑定提交评论事件
+        $(".comment_btn").click(function () {
+
+            if ("{{ request.user.username }}") {
+
+                // "@alex\n567"
+
+                var article_id = $("#info").attr("article_id");
+
+
+                if ($("#comment_text").val()[0] !== "@") {
+                    pid = ""
+                }
+
+
+                if (pid) {  // 截取子评论内容
+                    var index = $("#comment_text").val().indexOf("\n");
+                    var content = $("#comment_text").val().slice(index + 1)
+                } else {
+                    var content = $("#comment_text").val();
+                }
+
+
+                $.ajax({
+                    url: "/app01/comment/",
+                    type: "post",
+                    data: {
+                        article_id: article_id,
+                        content: content,
+                        pid: pid,
+                        csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
+
+                    },
+                    success: function (data) {
+                        console.log(data);
+
+                        if (data.state) { // 提交功能
+
+                            var floor = $(".comment_list .comment_item").length + 1
+                            var ctime = data.time;
+                            var username = $("#info").attr("username");
+                            var content = data.content;
+                            var s = '<li class="list-group-item comment_item"> <div> <a href="">#' + floor + '楼</a>&nbsp;&nbsp;&nbsp; <span>' + ctime + '</span>&nbsp;&nbsp;<a href="">' + username + '</a></div> <div> <p>' + content + '</p> </div> </li>'
+
+                            $(".comment_list").append(s)
+
+
+                            // 清空
+                            $("#comment_text").val("");
+                            pid = ""
+
+                        }
+                    },
+
+
+                })
+
+
+            } else {  // 未登录
+
+                location.href = "/login/"
+
+            }
+
+
+        });
+
+        // 绑定回复按钮事件
+        $(".comment_item .reply").click(function () {
+            $("#comment_text").focus();
+            var val = "@" + $(this).attr("username") + "\n";
+            $("#comment_text").val(val);
+
+            pid = $(this).attr("pk")
+        })
+
+    </script>
+
+
+
+
+    {% csrf_token %}
+    <script src="/static/js/article_detail.js"></script>
+
+
+{% endblock %}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width">
+    <title>用户登录</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+
+    <style>
+        .c1 {
+            margin-top: 100px;
+        }
+
+        .btn {
+            width: 300px;
+        }
+
+        .c2 {
+            margin-left: 80px;
+        }
+
+        .reg {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="c1 col-md-5 col-md-offset-3">
+            <form class="form-horizontal" action="" method="post" novalidate>
+
+                <h3 style="text-align: center">请登录</h3>
+                <div class="form-group">
+                    <label for="user" class="col-sm-2 control-label">用户名</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="user" placeholder="username" value="root">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pwd" class="col-sm-2 control-label">密码</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="pwd"
+                               placeholder="Password" value="root1234">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="col-sm-2 control-label">验证码</label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="valid_code">
+                        </div>
+                        <div class="col-md-6">
+                           <img width="250" height="40" id="valid_img" src="/get_valid_img" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="button" class="btn btn-info login_btn" value="登录">
+                        <span class="error" style="color: red;margin-left: 20px"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <a href="/reg/" class="reg">
+                            <input type="button" class="btn btn-info" value="注册">
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+{% csrf_token %}
+<script>
+
+    $(".login_btn").on("click", function () {
+
+        $.ajax({
+            url: "",
+            type: "post",
+            data: {
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                user: $("#user").val(),
+                pwd: $("#pwd").val(),
+                valid_code: $("#valid_code").val(),
+            },
+            success: function (data) {
+                console.log(data)
+                if (data.state) {
+                    location.href = "/index/"
+                }
+                else {
+                    $(".error").text(data.msg)
+                }
+            }
+        })
+    });
+        // 验证码刷新
+
+    $("#valid_img").click(function () {
+        $(this)[0].src+="?"
+    });
+
+</script>
+</body>
+</html>

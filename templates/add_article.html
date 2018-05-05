@@ -1,0 +1,38 @@
+{% extends 'dash.html' %}
+
+{% block Dashboard %}
+
+<div class="header">
+
+</div>
+<div class="content">
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="title">
+            标题：<input type="text" name="title">
+        </div>
+        <div>
+            内容:<br>
+            <textarea name="article_con" id="article_box" cols="30" rows="10"></textarea>
+        </div>
+        <input type="submit">
+    </form>
+</div>
+
+<script src="/static/kindeditor/kindeditor-all.js"></script>
+<script>
+
+    KindEditor.ready(function (k) {
+        window.editor=k.create("#article_box",{
+            width:600,
+            height:400,
+            resizeType:0,
+            uploadJson:"/upload_img/",
+            extraFileUploadParams:{"csrfmiddlewaretoken":$("[name='csrfmiddlewaretoken']").val()},
+            filePostName:"img"
+        })
+
+    })
+
+</script>
+{% endblock %}

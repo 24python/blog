@@ -1,0 +1,48 @@
+{% extends 'dash.html' %}
+
+{% block Dashboard %}
+
+
+ <h3 class="pull-right">欢迎{{ request.user.username }}登录</h3>
+        <div class="bs-example" data-example-id="bordered-table">
+            <!--表格信息-->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>发布时间</th>
+                    <th>评论数</th>
+                    <th>点赞数</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for article in article_list %}
+
+                    <tr>
+                        <th scope="row">
+                            <a href="/app01/{{ article.user.username }}/articles/{{ article.pk }}">{{ article.title }}</a>
+                        </th>
+
+                        <td>{{ article.create_time|date:"Y-m-d" }}</td>
+                        <td>{{ article.comment_count }}</td>
+                        <td>{{ article.up_count }}</td>
+                        <td>
+                            <a href="/del/{{ book.nid }}">
+                                <button class="btn btn-danger">删除</button>
+                            </a>
+                            <a href="/edit/?article_id={{ article.nid }}">
+                                <button class="btn btn-success">编辑</button>
+                            </a>
+                        </td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        <!--表格信息 end-->
+        </div>
+
+    </div>
+{% endblock %}

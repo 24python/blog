@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block style %}
+    {{ block.super }}
+    .form-horizontal {
+    margin-top: 100px;
+    }
+    .panel{
+    margin-top:30px;
+    width: 700px;
+    height: 500px;
+    margin-left: 200px;
+    }
+    .btn{
+    width:150px;
+    margin-left:200px;
+    }
+
+{% endblock %}
+
+{% block add %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 c1">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">修改密码</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal" method="post" action="/set_pwd/">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="oldpassword" class="col-sm-2 control-label">旧密码</label>
+                                <div class="col-sm-6">
+                                    <input type="password" class="form-control" id="oldpassword"
+                                           placeholder="Oldpassword"
+                                           name="oldpassword">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="newpassword" class="col-sm-2 control-label">新密码</label>
+                                <div class="col-sm-6">
+                                    <input type="password" class="form-control" id="newpassword"
+                                           placeholder="Newpassword"
+                                           name="newpassword">
+                                </div>
+                            </div>
+                           <button type="submit" class="btn btn-success">确定</button>
+                        </form>
+
+                        <h3>{{ info }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
